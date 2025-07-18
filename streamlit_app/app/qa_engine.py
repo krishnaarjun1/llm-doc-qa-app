@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-qa_pipeline = pipeline("text2text-generation", model="mistralai/Mistral-7B-Instruct-v0.2")
+qa_pipeline = pipeline("summarization", model="google/flan-t5-base")
 
 def build_prompt(context, question):
     return f"""Answer the question using only the context below.
