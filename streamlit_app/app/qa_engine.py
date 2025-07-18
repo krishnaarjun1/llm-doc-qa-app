@@ -1,21 +1,17 @@
 from transformers import pipeline
 
-# Use the correct pipeline type
-qa_pipeline = pipeline("text2text-generation", model="google/flan-t5-base")
-
-def build_prompt(context, question):
-    return f"""Answer the question using only the context below.
-
-Context:
-{context}
-
-Question: {question}
-Answer:"""
+# Load QA pipeline with SQuAD2 model
+qa_pipeline = pipeline("question-answering", model="deepset/roberta-base-squad2")
 
 def answer_question(chunks, question):
-    context = "\n".join(chunks)
-    prompt = build_prompt(context, question)
-    result = qa_pipeline(prompt, max_new_tokens=300)
+    """
+    Uses the top-ranked document chunks and answers the question using Hugging Face QA model.
+    """
+    # Join all chunks into one large context or top-N relevant ones
+    # Ideally, use semantic ranking to select top 3–5 chunks
+    context = "\n".join(chunks[:3])  # Use top 3 chunks (assuming pre-ranked)
 
-    # Defensive return (some versions may return 'text' instead of 'generated_text')
-    return result[0].get('generated_text') or result[0].get('text', '[No answer generated]')
+    # Format input as expected by the QA pipeline
+    result = qa_pipeline(question=question, context=context)
+
+    return result["answer"]
